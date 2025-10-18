@@ -10,16 +10,22 @@ from credit_manager import CreditManager
 from config import Config
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'])
 
 # Configure upload settings
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 # Initialize components
+print("🚀 Initializing Music-to-Video Generator with REAL Higgsfield API...")
+print(f"   API Key: {Config.HIGGSFIELD_API_KEY[:8]}...")
+print(f"   API Secret: {Config.HIGGSFIELD_API_SECRET[:8]}...")
+
 music_analyzer = MusicAnalyzer()
 video_generator = VideoGenerator()
 credit_manager = CreditManager(Config.TOTAL_BUDGET)
+
+print("✅ All components initialized with REAL API!")
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -104,17 +110,47 @@ def generate_video():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(file_path)
         
-        # Generate video
-        result = video_generator.create_video_from_music(file_path)
+        # Generate video using REAL Higgsfield API
+        print("🎬 Starting video generation with REAL Higgsfield API...")
+        print(f"   File: {file_path}")
+        print(f"   File exists: {os.path.exists(file_path)}")
         
-        # Clean up uploaded file
-        os.remove(file_path)
-        
-        return jsonify({
-            "status": "success",
-            "result": result,
-            "message": f"Successfully generated {len(result['video_urls'])} video clips!"
-        })
+        try:
+            result = video_generator.create_video_from_music(file_path)
+            print("✅ Video generation completed!")
+            print(f"   Generated {len(result['video_urls'])} videos")
+            print(f"   Budget used: ${result['budget_used']:.2f}")
+            print(f"   Budget remaining: ${result['budget_remaining']:.2f}")
+            
+            # DEBUG: Print video URLs
+            for i, video in enumerate(result['video_urls']):
+                print(f"   Video {i+1}: {video['url'][:50]}...")
+                print(f"   Type: {video['type']}")
+                print(f"   Description: {video.get('description', 'N/A')[:50]}...")
+            
+            # Clean up uploaded file
+            os.remove(file_path)
+            
+            return jsonify({
+                "status": "success",
+                "result": result,
+                "message": f"Successfully generated {len(result['video_urls'])} video clips!"
+            })
+            
+        except Exception as e:
+            print(f"❌ Video generation failed: {e}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            
+            # Clean up uploaded file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            return jsonify({
+                "status": "error",
+                "error": str(e),
+                "message": "Video generation failed. Check server logs for details."
+            }), 500
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500

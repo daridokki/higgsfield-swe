@@ -2,11 +2,12 @@ class CreditManager:
     def __init__(self, total_budget=100.00):
         self.total_budget = total_budget
         self.used_budget = 0.0
-        # Estimated costs - you should check actual Higgsfield pricing!
+        # Actual Higgsfield pricing from documentation
+        # $1 = 16 credits, so 1 credit = $0.0625
         self.estimated_costs = {
-            'nano_banana': 0.05,  # Text-to-image
-            'kling-2-5': 0.15,    # Image-to-video
-            'kling-2-1-master-t2v': 0.25  # Text-to-video
+            'nano-banana': 0.09,      # Text-to-image (1.5 credits = $0.09)
+            'kling-2-5': 0.25,         # Image-to-video Kling 2.5 Turbo (4 credits = $0.25)
+            'minimax-t2v': 0.50        # Text-to-video Minimax T2V (8 credits = $0.50)
         }
     
     def can_afford(self, model_type, operation_count=1):

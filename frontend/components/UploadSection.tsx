@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { Upload } from 'lucide-react'
-
+import { apiService } from '../lib/api'
 
 interface UploadSectionProps {
   onFileUpload: (file: File) => void
@@ -10,6 +10,21 @@ interface UploadSectionProps {
 
 export default function UploadSection({ onFileUpload }: UploadSectionProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<string>('')
+
+  const testConnection = async () => {
+    try {
+      setConnectionStatus('Testing connection...')
+      const response = await apiService.checkHealth()
+      if (response.status === 'success') {
+        setConnectionStatus('✅ Backend connected successfully!')
+      } else {
+        setConnectionStatus('❌ Backend connection failed')
+      }
+    } catch (error) {
+      setConnectionStatus('❌ Backend connection failed: ' + (error as Error).message)
+    }
+  }
 
   const handleFileSelect = useCallback((file: File) => {
     if (file && file.type.startsWith('audio/')) {
@@ -44,33 +59,91 @@ export default function UploadSection({ onFileUpload }: UploadSectionProps) {
   }
 
   return (
-    <div 
-      className={`dropzone ${isDragging ? 'active' : ''}`}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-    >
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <div className="bg-indigo-900/50 p-6 rounded-full">
-          <Upload className="w-12 h-12 text-indigo-400" />
+    <div className="flex flex-col items-center justify-center">
+      <div 
+        className={`dropzone ${isDragging ? 'active' : ''} w-full max-w-2xl`}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+      >
+        <div className="flex flex-col items-center justify-center space-y-6">
+          <div className="p-8 rounded-full bg-surface border border-border">
+            <Upload className="w-16 h-16 text-accent" />
+          </div>
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-semibold text-text-primary">
+              Drop your audio file here
+            </h2>
+            <p className="text-text-secondary">
+              Supports MP3, WAV, M4A, and OGG formats
+            </p>
+          </div>
+          
+          <input 
+            type="file" 
+            id="audio-upload"
+            accept="audio/*"
+            className="hidden"
+            onChange={onFileInputChange}
+          />
+          
+          <div className="space-y-4">
+            <button 
+              onClick={() => document.getElementById('audio-upload')?.click()}
+              className="btn-primary text-lg px-8 py-4"
+            >
+              Select File
+            </button>
+            
+            <div className="text-center">
+              <button 
+                onClick={testConnection}
+                className="btn-secondary text-sm px-4 py-2"
+              >
+                Test Backend Connection
+              </button>
+              {connectionStatus && (
+                <p className="mt-2 text-sm text-text-secondary">{connectionStatus}</p>
+              )}
+            </div>
+          </div>
         </div>
-        <h2 className="text-2xl font-semibold">Drop your audio file here</h2>
-        <p className="text-gray-400">Or click to browse your files</p>
+      </div>
+      
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+        <div className="card text-center">
+          <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <Upload className="w-6 h-6 text-accent" />
+          </div>
+          <h3 className="font-semibold mb-2">Upload</h3>
+          <p className="text-text-secondary text-sm">
+            Drag and drop or select your audio file
+          </p>
+        </div>
         
-        <input 
-          type="file" 
-          id="audio-upload"
-          accept="audio/*"
-          className="hidden"
-          onChange={onFileInputChange}
-        />
+        <div className="card text-center">
+          <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 className="font-semibold mb-2">Analyze</h3>
+          <p className="text-text-secondary text-sm">
+            AI analyzes tempo, mood, and energy
+          </p>
+        </div>
         
-        <button 
-          onClick={() => document.getElementById('audio-upload')?.click()}
-          className="mt-4 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full font-medium hover:opacity-90 transition-all pulse"
-        >
-          Select File
-        </button>
+        <div className="card text-center">
+          <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="font-semibold mb-2">Generate</h3>
+          <p className="text-text-secondary text-sm">
+            Create stunning visual experiences
+          </p>
+        </div>
       </div>
     </div>
   )

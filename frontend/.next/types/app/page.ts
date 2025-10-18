@@ -1,4 +1,4 @@
-// File: C:\Users\bakht\OneDrive\Рабочий стол\higgsfield-swe\frontend\app\page.tsx
+// File: /Users/altynhandariya/higgsfield-swe/frontend/app/page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

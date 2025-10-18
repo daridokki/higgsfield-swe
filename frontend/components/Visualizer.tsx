@@ -8,7 +8,7 @@ interface VisualizerProps {
 
 export default function Visualizer({ isPlaying }: VisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -25,14 +25,15 @@ export default function Visualizer({ isPlaying }: VisualizerProps) {
       if (!ctx || !canvas) return
 
       // Clear canvas
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+      ctx.fillStyle = '#111111'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       if (isPlaying) {
-        // Create gradient
+        // Create gradient with higgsfield.ai accent color
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0)
-        gradient.addColorStop(0, '#7f5af0')
-        gradient.addColorStop(1, '#2cb67d')
+        gradient.addColorStop(0, 'rgb(209, 254, 23)')
+        gradient.addColorStop(0.5, 'rgba(209, 254, 23, 0.8)')
+        gradient.addColorStop(1, 'rgba(209, 254, 23, 0.6)')
 
         // Draw animated bars
         const barCount = 50
@@ -61,7 +62,7 @@ export default function Visualizer({ isPlaying }: VisualizerProps) {
   }, [isPlaying])
 
   return (
-    <div className="visualizer rounded-xl overflow-hidden mb-8 h-64">
+    <div className="visualizer h-80">
       <canvas 
         ref={canvasRef} 
         className="w-full h-full"

@@ -8,7 +8,16 @@ module.exports = {
     theme: {
       extend: {
         fontFamily: {
-          sans: ['Poppins', 'sans-serif'],
+          sans: ['Space Grotesk', 'sans-serif'],
+        },
+        colors: {
+          accent: 'rgb(209, 254, 23)',
+          'accent-hover': 'rgb(189, 234, 3)',
+          background: '#000000',
+          surface: '#111111',
+          border: '#222222',
+          'text-primary': '#ffffff',
+          'text-secondary': '#a0a0a0',
         },
         backgroundImage: {
           'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

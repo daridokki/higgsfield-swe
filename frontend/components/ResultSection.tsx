@@ -22,48 +22,53 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
 
   const { music_analysis, video_urls, budget_used, budget_remaining } = generationResult
 
+  // DEBUG: Log the received data
+  console.log('ResultSection received:', generationResult)
+  console.log('Video URLs:', video_urls)
+  console.log('Number of videos:', video_urls?.length || 0)
+
   return (
-    <div className="mt-12">
+    <div className="max-w-6xl mx-auto">
       {/* Music Analysis Results */}
-      <div className="bg-gray-800/50 rounded-xl p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Music className="w-5 h-5 text-purple-400" />
+      <div className="card mb-8">
+        <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+          <Music className="w-6 h-6 text-accent" />
           Music Analysis
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-400">{music_analysis.tempo}</div>
-            <div className="text-sm text-gray-400">BPM</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="text-center p-4 bg-surface rounded-lg border border-border">
+            <div className="text-3xl font-bold text-accent mb-2">{music_analysis.tempo}</div>
+            <div className="text-sm text-text-secondary">BPM</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">{(music_analysis.energy * 100).toFixed(0)}%</div>
-            <div className="text-sm text-gray-400">Energy</div>
+          <div className="text-center p-4 bg-surface rounded-lg border border-border">
+            <div className="text-3xl font-bold text-accent mb-2">{(music_analysis.energy * 100).toFixed(0)}%</div>
+            <div className="text-sm text-text-secondary">Energy</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-400 capitalize">{music_analysis.mood}</div>
-            <div className="text-sm text-gray-400">Mood</div>
+          <div className="text-center p-4 bg-surface rounded-lg border border-border">
+            <div className="text-3xl font-bold text-accent mb-2 capitalize">{music_analysis.mood}</div>
+            <div className="text-sm text-text-secondary">Mood</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400">{music_analysis.duration}s</div>
-            <div className="text-sm text-gray-400">Duration</div>
+          <div className="text-center p-4 bg-surface rounded-lg border border-border">
+            <div className="text-3xl font-bold text-accent mb-2">{music_analysis.duration}s</div>
+            <div className="text-sm text-text-secondary">Duration</div>
           </div>
         </div>
       </div>
 
       {/* Budget Status */}
-      <div className="bg-gray-800/50 rounded-xl p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-green-400" />
+      <div className="card mb-8">
+        <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+          <DollarSign className="w-6 h-6 text-accent" />
           Budget Status
         </h3>
         <div className="flex justify-between items-center">
-          <div>
-            <div className="text-sm text-gray-400">Used: ${budget_used.toFixed(2)}</div>
-            <div className="text-sm text-gray-400">Remaining: ${budget_remaining.toFixed(2)}</div>
+          <div className="space-y-2">
+            <div className="text-lg text-text-primary">Used: <span className="text-accent">${budget_used.toFixed(2)}</span></div>
+            <div className="text-lg text-text-primary">Remaining: <span className="text-accent">${budget_remaining.toFixed(2)}</span></div>
           </div>
-          <div className="w-32 bg-gray-700 rounded-full h-2">
+          <div className="w-48 bg-border rounded-full h-3">
             <div 
-              className="bg-green-500 h-2 rounded-full transition-all duration-300"
+              className="bg-accent h-3 rounded-full transition-all duration-500"
               style={{ width: `${(budget_used / (budget_used + budget_remaining)) * 100}%` }}
             ></div>
           </div>
@@ -71,48 +76,50 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
       </div>
 
       {/* Generated Videos */}
-      <div className="space-y-6">
-        <h3 className="text-xl font-semibold flex items-center gap-2">
-          <Zap className="w-5 h-5 text-yellow-400" />
+      <div className="space-y-8">
+        <h3 className="text-2xl font-semibold flex items-center gap-3">
+          <Zap className="w-6 h-6 text-accent" />
           Generated Videos ({video_urls.length})
         </h3>
         
-        {video_urls.map((video, index) => (
-          <div 
-            key={index}
-            className="visualizer rounded-xl overflow-hidden h-96 relative"
-            onMouseEnter={() => setShowDownloadOverlay(true)}
-            onMouseLeave={() => setShowDownloadOverlay(false)}
-          >
-            <video 
-              src={video.url} 
-              controls 
-              className="w-full h-full object-cover"
-            />
+        <div className="grid grid-cols-1 gap-8">
+          {video_urls.map((video, index) => (
             <div 
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-black/50 ${
-                showDownloadOverlay ? 'opacity-100' : 'opacity-0'
-              }`}
+              key={index}
+              className="visualizer h-96 relative group"
+              onMouseEnter={() => setShowDownloadOverlay(true)}
+              onMouseLeave={() => setShowDownloadOverlay(false)}
             >
-              <button 
-                onClick={() => handleDownload(video.url, index)}
-                className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition flex items-center space-x-2"
+              <video 
+                src={video.url} 
+                controls 
+                className="w-full h-full object-cover"
+              />
+              <div 
+                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-black/60 ${
+                  showDownloadOverlay ? 'opacity-100' : 'opacity-0'
+                }`}
               >
-                <Download size={20} />
-                <span>Download Video {index + 1}</span>
-              </button>
+                <button 
+                  onClick={() => handleDownload(video.url, index)}
+                  className="btn-primary text-lg px-6 py-3 flex items-center space-x-3"
+                >
+                  <Download size={20} />
+                  <span>Download Video {index + 1}</span>
+                </button>
+              </div>
+              <div className="absolute top-4 left-4 bg-background/90 px-4 py-2 rounded-lg text-sm font-medium border border-border">
+                {video.type === 'special' ? '✨ Special Moment' : `🎬 Scene ${index + 1}`}
+              </div>
             </div>
-            <div className="absolute top-4 left-4 bg-black/70 px-3 py-1 rounded-full text-sm">
-              {video.type === 'special' ? '✨ Special Moment' : `🎬 Scene ${index + 1}`}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       
-      <div className="mt-8 text-center">
+      <div className="mt-12 text-center">
         <button 
           onClick={onNewUpload}
-          className="px-6 py-2 border border-gray-600 rounded-full font-medium hover:bg-gray-800/50 transition flex items-center space-x-2 mx-auto"
+          className="btn-secondary text-lg px-8 py-4 flex items-center space-x-3 mx-auto"
         >
           <Plus size={20} />
           <span>Create Another</span>

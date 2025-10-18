@@ -1,23 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* Import Tailwind layers */
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-body {
-  font-family: 'Poppins', sans-serif;
+/* CSS Variables for higgsfield.ai design system */
+:root {
+  --accent-color: rgb(209, 254, 23);
+  --accent-color-hover: rgb(189, 234, 3);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --background: #000000;
+  --surface: #111111;
+  --border: #222222;
 }
 
-/* Custom component styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom component styles - higgsfield.ai inspired */
 .waveform {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   border-radius: 9999px;
-  height: 6px;
+  height: 4px;
 }
 
 .waveform-progress {
-  background: linear-gradient(90deg, #7f5af0 0%, #2cb67d 100%);
+  background: var(--accent-color);
   border-radius: 9999px;
   height: 100%;
   width: 0%;
@@ -25,24 +47,30 @@ body {
 }
 
 .dropzone {
-  border: 2px dashed rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  padding: 2rem;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 3rem 2rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: var(--surface);
+}
+
+.dropzone:hover {
+  border-color: var(--accent-color);
+  background: rgba(209, 254, 23, 0.05);
 }
 
 .dropzone.active {
-  border-color: #7f5af0;
-  background: rgba(127, 90, 240, 0.1);
+  border-color: var(--accent-color);
+  background: rgba(209, 254, 23, 0.1);
 }
 
 .visualizer {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .pulse {
@@ -52,14 +80,74 @@ body {
 @keyframes pulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(127, 90, 240, 0.7);
+    box-shadow: 0 0 0 0 rgba(209, 254, 23, 0.4);
   }
   70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(127, 90, 240, 0);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 8px rgba(209, 254, 23, 0);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(127, 90, 240, 0);
+    box-shadow: 0 0 0 0 rgba(209, 254, 23, 0);
   }
+}
+
+/* Button styles */
+.btn-primary {
+  background: var(--accent-color);
+  color: var(--background);
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-color-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: 400;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* Card styles */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+/* Text styles */
+.text-accent {
+  color: var(--accent-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-color) 0%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

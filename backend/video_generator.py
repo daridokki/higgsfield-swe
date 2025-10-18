@@ -89,24 +89,31 @@ class VideoGenerator:
         """Generate actual video content using Higgsfield APIs"""
         video_urls = []
         
+        print(f"🎬 Starting video generation with {len(scene_plan['scenes'])} scenes...")
+        print(f"   Budget check: ${self.credit_manager.get_remaining_budget():.2f} remaining")
+        
         # Generate regular scenes (2 scenes to save credits)
         for i, scene in enumerate(scene_plan['scenes'][:2]):
             print(f"   🎨 Generating scene {i+1}/2...")
+            print(f"     Image prompt: {scene['image_prompt'][:50]}...")
+            print(f"     Video prompt: {scene['video_prompt'][:50]}...")
             
-            # Check budget before proceeding
-            if not self.credit_manager.can_afford('nano_banana', 2):
+            # Check budget before proceeding (nano-banana + kling-2-5)
+            if not self.credit_manager.can_afford('nano-banana', 1) or not self.credit_manager.can_afford('kling-2-5', 1):
                 print("   💰 Budget too low - stopping generation")
                 break
             
             try:
                 # Generate image
-                print("     🖼️ Creating image...")
+                print("     🖼️ Creating image with Nano Banana...")
                 image_url = self.api_client.text_to_image(scene['image_prompt'])
-                self.credit_manager.add_usage('nano_banana')
+                print(f"     ✅ Image created: {image_url[:50]}...")
+                self.credit_manager.add_usage('nano-banana')
                 
                 # Animate image to video
-                print("     🎥 Animating to video...")
+                print("     🎥 Animating to video with Kling 2.5 Turbo...")
                 video_url = self.api_client.image_to_video(image_url, scene['video_prompt'])
+                print(f"     ✅ Video created: {video_url[:50]}...")
                 self.credit_manager.add_usage('kling-2-5')
                 
                 video_urls.append({
@@ -114,23 +121,26 @@ class VideoGenerator:
                     'description': scene['video_prompt'],
                     'type': 'scene'
                 })
-                print(f"     ✅ Scene {i+1} completed!")
+                print(f"     ✅ Scene {i+1} completed successfully!")
                 
             except Exception as e:
                 print(f"     ❌ Failed to generate scene {i+1}: {e}")
+                print(f"     Error type: {type(e).__name__}")
+                import traceback
+                print(f"     Traceback: {traceback.format_exc()}")
                 continue
         
         # Add special moment if budget allows and music is energetic
         if (music_analysis['energy'] > 0.7 and 
             len(scene_plan['special_moments']) > 0 and
-            self.credit_manager.can_afford('kling-2-1-master-t2v')):
+            self.credit_manager.can_afford('minimax-t2v')):
             
             print("   💫 Adding special moment...")
             try:
                 special_video = self.api_client.text_to_video(
                     scene_plan['special_moments'][0]
                 )
-                self.credit_manager.add_usage('kling-2-1-master-t2v')
+                self.credit_manager.add_usage('minimax-t2v')
                 video_urls.append({
                     'url': special_video,
                     'description': scene_plan['special_moments'][0],

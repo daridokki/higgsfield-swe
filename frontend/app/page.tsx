@@ -22,16 +22,33 @@ export default function Home() {
     setError(null)
     
     try {
+      // First check if backend is running
+      console.log('Checking backend health...')
+      const healthResponse = await apiService.checkHealth()
+      console.log('Health check response:', healthResponse)
+      
+      if (healthResponse.status === 'error') {
+        throw new Error(`Backend server is not running: ${healthResponse.error}`)
+      }
       // First analyze the music
       const analysisResponse = await apiService.analyzeMusic(file)
-      console.log('Music analysis:', analysisResponse.analysis)
+      console.log('Music analysis:', analysisResponse.data?.analysis)
       
       // Then generate the video
       const videoResponse = await apiService.generateVideo(file)
-      console.log('Video generation result:', videoResponse.result)
+      console.log('Full video response:', videoResponse)
+      console.log('Video generation result:', videoResponse.data)
       
-      setGenerationResult(videoResponse.result)
-      setCurrentState('result')
+      if (videoResponse.status === 'success' && videoResponse.data) {
+        console.log('Setting generation result:', videoResponse.data)
+        console.log('Video URLs:', videoResponse.data.video_urls)
+        console.log('Number of videos:', videoResponse.data.video_urls?.length || 0)
+        setGenerationResult(videoResponse.data)
+        setCurrentState('result')
+      } else {
+        console.error('Video generation failed:', videoResponse)
+        throw new Error(videoResponse.error || 'No video data received')
+      }
     } catch (err) {
       console.error('Error during processing:', err)
       setError(err instanceof Error ? err.message : 'An error occurred during processing')
@@ -49,48 +66,50 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <header className="text-center mb-16">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">
-          SonicCanvas
-        </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-          Upload your audio and watch it transform into a mesmerizing visual experience ✨
-        </p>
-      </header>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-16">
+        <header className="text-center mb-20">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">
+            SonicCanvas
+          </h1>
+          <p className="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
+            Transform your audio into stunning visual experiences with AI-powered generation
+          </p>
+        </header>
 
-      <main className="max-w-4xl mx-auto">
-        {currentState === 'upload' && (
-          <UploadSection onFileUpload={handleFileUpload} />
-        )}
-        
-        {currentState === 'processing' && audioFile && (
-          <ProcessingSection 
-            audioFile={audioFile}
-            isProcessing={isProcessing}
-            onCancel={() => setCurrentState('upload')}
-          />
-        )}
-        
-        {currentState === 'result' && generationResult && (
-          <ResultSection 
-            generationResult={generationResult}
-            onNewUpload={handleNewUpload}
-          />
-        )}
-        
-        {error && (
-          <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 text-center">
-            <p className="text-red-400">Error: {error}</p>
-            <button 
-              onClick={handleNewUpload}
-              className="mt-2 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-      </main>
+        <main className="max-w-5xl mx-auto">
+          {currentState === 'upload' && (
+            <UploadSection onFileUpload={handleFileUpload} />
+          )}
+          
+          {currentState === 'processing' && audioFile && (
+            <ProcessingSection 
+              audioFile={audioFile}
+              isProcessing={isProcessing}
+              onCancel={() => setCurrentState('upload')}
+            />
+          )}
+          
+          {currentState === 'result' && generationResult && (
+            <ResultSection 
+              generationResult={generationResult}
+              onNewUpload={handleNewUpload}
+            />
+          )}
+          
+          {error && (
+            <div className="card border-red-500/20 bg-red-950/10 text-center">
+              <p className="text-red-400 mb-4">Error: {error}</p>
+              <button 
+                onClick={handleNewUpload}
+                className="btn-secondary"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
