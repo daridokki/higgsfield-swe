@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'SonicCanvas | Audio to Visual Magic',
-  description: 'Upload your audio and watch it transform into a mesmerizing visual experience',
+  title: 'Higgsfield: Vision of Sound | Audio to Visual Magic',
+  description: 'Upload your audio and watch it transform into a mesmerizing visual experience powered by Higgsfield AI',
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

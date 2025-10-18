@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Download, Plus, Music, Zap, DollarSign } from 'lucide-react'
+import { Download, Plus, Music, Zap } from 'lucide-react'
 import { GenerationResult } from '../lib/api'
 
 interface ResultSectionProps {
@@ -20,7 +20,7 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
     link.click()
   }
 
-  const { music_analysis, video_urls, budget_used, budget_remaining } = generationResult
+  const { music_analysis, video_urls } = generationResult
 
   // DEBUG: Log the received data
   console.log('ResultSection received:', generationResult)
@@ -37,11 +37,11 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center p-4 bg-surface rounded-lg border border-border">
-            <div className="text-3xl font-bold text-accent mb-2">{music_analysis.tempo}</div>
+            <div className="text-3xl font-bold text-accent mb-2">{Math.round(music_analysis.tempo)}</div>
             <div className="text-sm text-text-secondary">BPM</div>
           </div>
           <div className="text-center p-4 bg-surface rounded-lg border border-border">
-            <div className="text-3xl font-bold text-accent mb-2">{(music_analysis.energy * 100).toFixed(0)}%</div>
+            <div className="text-3xl font-bold text-accent mb-2">{Math.round(music_analysis.energy * 100)}%</div>
             <div className="text-sm text-text-secondary">Energy</div>
           </div>
           <div className="text-center p-4 bg-surface rounded-lg border border-border">
@@ -49,31 +49,12 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
             <div className="text-sm text-text-secondary">Mood</div>
           </div>
           <div className="text-center p-4 bg-surface rounded-lg border border-border">
-            <div className="text-3xl font-bold text-accent mb-2">{music_analysis.duration}s</div>
+            <div className="text-3xl font-bold text-accent mb-2">{Math.round(music_analysis.duration)}s</div>
             <div className="text-sm text-text-secondary">Duration</div>
           </div>
         </div>
       </div>
 
-      {/* Budget Status */}
-      <div className="card mb-8">
-        <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-          <DollarSign className="w-6 h-6 text-accent" />
-          Budget Status
-        </h3>
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <div className="text-lg text-text-primary">Used: <span className="text-accent">${budget_used.toFixed(2)}</span></div>
-            <div className="text-lg text-text-primary">Remaining: <span className="text-accent">${budget_remaining.toFixed(2)}</span></div>
-          </div>
-          <div className="w-48 bg-border rounded-full h-3">
-            <div 
-              className="bg-accent h-3 rounded-full transition-all duration-500"
-              style={{ width: `${(budget_used / (budget_used + budget_remaining)) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
 
       {/* Generated Videos */}
       <div className="space-y-8">

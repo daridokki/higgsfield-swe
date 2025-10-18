@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react'
 import { Upload } from 'lucide-react'
-import { apiService } from '../lib/api'
 
 interface UploadSectionProps {
   onFileUpload: (file: File) => void
@@ -10,25 +9,34 @@ interface UploadSectionProps {
 
 export default function UploadSection({ onFileUpload }: UploadSectionProps) {
   const [isDragging, setIsDragging] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState<string>('')
 
-  const testConnection = async () => {
-    try {
-      setConnectionStatus('Testing connection...')
-      const response = await apiService.checkHealth()
-      if (response.status === 'success') {
-        setConnectionStatus('✅ Backend connected successfully!')
-      } else {
-        setConnectionStatus('❌ Backend connection failed')
-      }
-    } catch (error) {
-      setConnectionStatus('❌ Backend connection failed: ' + (error as Error).message)
+  const validateFile = (file: File): { valid: boolean; error?: string } => {
+    // Check file type
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/ogg', 'audio/x-m4a']
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a|ogg)$/i)) {
+      return { valid: false, error: 'Please upload an audio file (MP3, WAV, M4A, or OGG)' }
     }
+    
+    // Check file size (50MB limit)
+    const maxSize = 50 * 1024 * 1024 // 50MB
+    if (file.size > maxSize) {
+      return { valid: false, error: 'File too large. Maximum size is 50MB' }
+    }
+    
+    // Check minimum size (1KB)
+    if (file.size < 1024) {
+      return { valid: false, error: 'File too small. Please upload a valid audio file' }
+    }
+    
+    return { valid: true }
   }
 
   const handleFileSelect = useCallback((file: File) => {
-    if (file && file.type.startsWith('audio/')) {
+    const validation = validateFile(file)
+    if (validation.valid) {
       onFileUpload(file)
+    } else {
+      alert(validation.error)
     }
   }, [onFileUpload])
 
@@ -95,17 +103,6 @@ export default function UploadSection({ onFileUpload }: UploadSectionProps) {
               Select File
             </button>
             
-            <div className="text-center">
-              <button 
-                onClick={testConnection}
-                className="btn-secondary text-sm px-4 py-2"
-              >
-                Test Backend Connection
-              </button>
-              {connectionStatus && (
-                <p className="mt-2 text-sm text-text-secondary">{connectionStatus}</p>
-              )}
-            </div>
           </div>
         </div>
       </div>

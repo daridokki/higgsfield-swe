@@ -70,7 +70,7 @@ export default function Home() {
       <div className="container mx-auto px-6 py-16">
         <header className="text-center mb-20">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">
-            SonicCanvas
+            Higgsfield: Vision of Sound
           </h1>
           <p className="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
             Transform your audio into stunning visual experiences with AI-powered generation

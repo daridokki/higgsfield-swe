@@ -16,16 +16,8 @@ export interface VideoUrl {
 export interface VideoResult {
   music_analysis: MusicAnalysis
   video_urls: VideoUrl[]
-  budget_used: number
-  budget_remaining: number
 }
 
-export interface BudgetInfo {
-  used: number
-  remaining: number
-  total: number
-  percentage_used: number
-}
 
 // This is the same as VideoResult but with a different name for clarity
 export type GenerationResult = VideoResult

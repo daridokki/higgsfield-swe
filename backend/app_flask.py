@@ -6,7 +6,6 @@ import json
 from werkzeug.utils import secure_filename
 from music_analyzer import MusicAnalyzer
 from video_generator import VideoGenerator
-from credit_manager import CreditManager
 from config import Config
 
 app = Flask(__name__)
@@ -23,7 +22,15 @@ print(f"   API Secret: {Config.HIGGSFIELD_API_SECRET[:8]}...")
 
 music_analyzer = MusicAnalyzer()
 video_generator = VideoGenerator()
-credit_manager = CreditManager(Config.TOTAL_BUDGET)
+
+# Global progress tracking
+current_progress = {
+    'step': '',
+    'progress': 0,
+    'current_step': 0,
+    'total_steps': 6,
+    'is_complete': False
+}
 
 print("✅ All components initialized with REAL API!")
 
@@ -41,19 +48,15 @@ def health_check():
         "endpoints": {
             "POST /analyze-music": "Analyze music without generating video",
             "POST /generate-video": "Full music-to-video generation",
-            "GET /budget": "Check budget status"
+            "GET /progress": "Get generation progress"
         }
     })
 
-@app.route('/budget', methods=['GET'])
-def get_budget():
-    """Get current budget status"""
-    return jsonify({
-        "used": round(credit_manager.used_budget, 2),
-        "remaining": round(credit_manager.get_remaining_budget(), 2),
-        "total": credit_manager.total_budget,
-        "percentage_used": round(credit_manager.get_usage_percentage(), 1)
-    })
+
+@app.route('/progress', methods=['GET'])
+def get_progress():
+    """Get current generation progress"""
+    return jsonify(current_progress)
 
 @app.route('/analyze-music', methods=['POST'])
 def analyze_music():
@@ -116,11 +119,31 @@ def generate_video():
         print(f"   File exists: {os.path.exists(file_path)}")
         
         try:
-            result = video_generator.create_video_from_music(file_path)
+            # Reset progress
+            current_progress.update({
+                'step': 'Starting generation...',
+                'progress': 0,
+                'current_step': 0,
+                'total_steps': 6,
+                'is_complete': False
+            })
+            
+            def progress_callback(progress_data):
+                global current_progress
+                current_progress.update(progress_data)
+                print(f"📊 Progress: {progress_data['step']} ({progress_data['progress']}%)")
+            
+            result = video_generator.create_video_from_music(file_path, progress_callback)
+            
+            # Mark as complete
+            current_progress.update({
+                'step': 'Generation complete!',
+                'progress': 100,
+                'is_complete': True
+            })
+            
             print("✅ Video generation completed!")
             print(f"   Generated {len(result['video_urls'])} videos")
-            print(f"   Budget used: ${result['budget_used']:.2f}")
-            print(f"   Budget remaining: ${result['budget_remaining']:.2f}")
             
             # DEBUG: Print video URLs
             for i, video in enumerate(result['video_urls']):
@@ -179,4 +202,4 @@ if __name__ == '__main__':
     print("   GET  http://localhost:5000/budget")
     print("")
     
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=8000, debug=True)

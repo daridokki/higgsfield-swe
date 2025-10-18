@@ -55,9 +55,9 @@ class HiggsfieldClient:
             # Create request
             req = urllib.request.Request(url, data=data_json, headers=headers, method=method)
             
-            # Add delay to avoid rate limiting
+            # Add minimal delay to avoid rate limiting
             import time
-            time.sleep(2)  # 2 second delay
+            time.sleep(1)  # 1 second delay for speed
             
             # Make request
             print(f"   ⏳ Sending request...")
@@ -108,9 +108,9 @@ class HiggsfieldClient:
             # Create request
             req = urllib.request.Request(url, data=data_json, headers=headers, method=method)
             
-            # Add delay to avoid rate limiting
+            # Add minimal delay to avoid rate limiting
             import time
-            time.sleep(2)  # 2 second delay
+            time.sleep(1)  # 1 second delay for speed
             
             # Make request
             print(f"   ⏳ Sending request...")
@@ -135,8 +135,8 @@ class HiggsfieldClient:
         """Poll until job is completed"""
         # REAL API ONLY - NO MOCK MODE
         
-        # Real polling implementation
-        max_attempts = 60  # 5 minutes max
+        # Real polling implementation - balanced for speed and reliability
+        max_attempts = 40  # 2 minutes max for reliable results
         for attempt in range(max_attempts):
             try:
                 print(f"   🔍 Checking job status (attempt {attempt + 1}/{max_attempts})...")
@@ -167,7 +167,7 @@ class HiggsfieldClient:
                 
                 if response is None:
                     print(f"   ⏳ All polling attempts failed, waiting... ({attempt + 1}/{max_attempts})")
-                    time.sleep(5)
+                    time.sleep(2)  # Fastest retry
                     continue
                 
                 
@@ -196,19 +196,21 @@ class HiggsfieldClient:
                         raise Exception(f"Higgsfield API job failed: {error_message}")
                     elif status in ['pending', 'running', 'queued', 'in_progress']:
                         print(f"   ⏳ Waiting for completion... ({attempt + 1}/{max_attempts})")
-                        time.sleep(5)
+                        time.sleep(2)  # Fastest polling for speed
                     else:
                         print(f"   ⚠️ Unknown job status: {status}")
                         time.sleep(5)
                 else:
                     print(f"   ⚠️ No jobs found in response")
-                    time.sleep(5)
+                    time.sleep(2)  # Fastest retry
                 
             except Exception as e:
                 print(f"   ❌ Polling error: {e}")
-                time.sleep(5)
+                time.sleep(3)  # Faster retry
         
-        raise Exception("Generation timed out")
+        print("   ⏰ Generation timed out - this may be due to high API load")
+        print("   💡 Tip: Try again in a few minutes or with a shorter audio file")
+        raise Exception("Generation timed out - API may be experiencing high load")
     
     def text_to_image(self, prompt, aspect_ratio="16:9"):
         """Generate image from text prompt using Nano Banana model"""

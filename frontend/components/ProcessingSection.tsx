@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Play, X, Wand } from 'lucide-react'
-import Visualizer from './Visualizer'
 
 interface ProcessingSectionProps {
   audioFile: File
@@ -14,6 +13,8 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [processingProgress, setProcessingProgress] = useState(0)
+  const [currentStep, setCurrentStep] = useState('Analyzing music...')
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -41,6 +42,38 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
     }
   }, [audioFile])
 
+  // Real progress tracking from backend
+  useEffect(() => {
+    if (!isProcessing) return
+
+    const pollProgress = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/progress')
+        const progressData = await response.json()
+        
+        setProcessingProgress(progressData.progress)
+        setCurrentStep(progressData.step)
+        
+        // Stop polling when complete
+        if (progressData.is_complete) {
+          return
+        }
+        
+        // Continue polling every 1 second
+        setTimeout(pollProgress, 1000)
+      } catch (error) {
+        console.error('Error polling progress:', error)
+        // Fallback to simulated progress if polling fails
+        setCurrentStep('Processing...')
+        setProcessingProgress(prev => Math.min(prev + 10, 90))
+        setTimeout(pollProgress, 2000)
+      }
+    }
+
+    // Start polling
+    pollProgress()
+  }, [isProcessing])
+
   const togglePlayback = () => {
     if (!audioRef.current) return
 
@@ -62,8 +95,6 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Visualizer isPlaying={isPlaying} />
-      
       <div className="card mt-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -119,14 +150,23 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
                 <Wand className="w-6 h-6 text-accent animate-pulse" />
               </div>
             </div>
-            <div className="space-y-2">
-              <h4 className="text-xl font-semibold text-text-primary">Generating your visual experience</h4>
-              <p className="text-text-secondary">This may take a few moments...</p>
-            </div>
-            <div className="flex space-x-2">
-              <div className="w-2 h-2 bg-accent rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-full max-w-md space-y-4">
+              <div className="space-y-2">
+                <h4 className="text-xl font-semibold text-text-primary">Generating your visual experience</h4>
+                <p className="text-text-secondary">{currentStep}</p>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="w-full bg-border rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-accent to-accent-hover h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${processingProgress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-text-secondary">
+                <span>Progress</span>
+                <span>{Math.round(processingProgress)}%</span>
+              </div>
             </div>
           </div>
         ) : (
