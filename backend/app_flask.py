@@ -15,7 +15,7 @@ allowed_origins = [
     'http://localhost:3000', 
     'http://127.0.0.1:3000',
     # Add your Vercel domain here after deployment
-    'https://your-app-name.vercel.app'
+    'https://YOUR_VERCEL_URL.vercel.app'
 ]
 
 # Allow all origins in development, specific origins in production
