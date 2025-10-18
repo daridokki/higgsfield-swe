@@ -113,12 +113,3 @@ class HiggsfieldClient:
         """Generate video directly from text (more expensive)"""
         if self.use_mock:
             return f"https://example.com/mock-special-{hash(prompt) % 1000}.mp4"
-            
-        params = {"prompt": prompt}
-        data = {"params": params}
-        
-        response = self._make_request(f"generations/{self.models['text_to_video']}", data)
-        job_set_id = response['id']
-        
-        print(f"Text-to-video generation submitted: {job_set_id}")
-        return self._poll_for_results(job_set_id)

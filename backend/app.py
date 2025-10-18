@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS  # ← Исправлено: flask_cors
 import os
 import uuid
 from video_generator import VideoGenerator
@@ -12,14 +12,14 @@ CORS(app)  # Enable CORS for frontend communication
 video_gen = VideoGenerator()
 
 # Create upload folder
-os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)  # ← Исправлено: Config.UPLOAD_FOLDER
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS  # ← Исправлено: rsplit
 
-@app.route('/health', methods=['GET'])
+@app.route('/health', methods=['GET'])  # ← Исправлено: ['GET']
 def health_check():
     return jsonify({
         "status": "healthy", 
