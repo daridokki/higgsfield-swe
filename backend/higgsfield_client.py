@@ -43,12 +43,24 @@ class HiggsfieldClient:
     def _mock_response(self, endpoint):
         """Return mock responses for testing without spending credits"""
         mock_id = f"mock_{random.randint(1000, 9999)}"
+        
+        # Use working sample videos for demonstration
+        sample_videos = [
+            "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+        ]
+        
+        # Return a random sample video
+        video_url = random.choice(sample_videos)
+        
         return {
             "id": mock_id,
             "jobs": [{
                 "status": "completed",
                 "results": {
-                    "raw": {"url": f"https://example.com/mock-{mock_id}.mp4"}
+                    "raw": {"url": video_url}
                 }
             }]
         }
@@ -59,7 +71,17 @@ class HiggsfieldClient:
             # Simulate some processing time
             print(f"   ⏳ Simulating AI generation...")
             time.sleep(2)
-            return f"https://example.com/generated-video-{job_set_id}.mp4"
+            
+            # Use working sample videos for demonstration
+            sample_videos = [
+                "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            ]
+            
+            # Return a random sample video
+            return random.choice(sample_videos)
             
         # Real implementation would go here
         return f"https://example.com/real-video-{job_set_id}.mp4"
@@ -69,7 +91,13 @@ class HiggsfieldClient:
         if self.use_mock:
             print(f"   🎨 Generating image: '{prompt[:50]}...'")
             time.sleep(1)
-            return f"https://example.com/mock-image-{hash(prompt) % 1000}.jpg"
+            # Return a working sample image URL
+            sample_images = [
+                "https://picsum.photos/800/600?random=1",
+                "https://picsum.photos/800/600?random=2", 
+                "https://picsum.photos/800/600?random=3"
+            ]
+            return random.choice(sample_images)
             
         # Real API call implementation
         params = {
@@ -90,7 +118,13 @@ class HiggsfieldClient:
         if self.use_mock:
             print(f"   🎥 Animating image: '{prompt[:50]}...'")
             time.sleep(2)
-            return f"https://example.com/mock-video-{hash(prompt) % 1000}.mp4"
+            # Return a working sample video URL
+            sample_videos = [
+                "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+            ]
+            return random.choice(sample_videos)
             
         # Real API call implementation
         params = {
@@ -110,7 +144,13 @@ class HiggsfieldClient:
         if self.use_mock:
             print(f"   ✨ Creating special video: '{prompt[:50]}...'")
             time.sleep(3)
-            return f"https://example.com/mock-special-{hash(prompt) % 1000}.mp4"
+            # Return a working sample video URL for special moments
+            sample_videos = [
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+            ]
+            return random.choice(sample_videos)
             
         # Real API call implementation
         params = {"prompt": prompt}

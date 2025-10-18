@@ -6,10 +6,11 @@ import Visualizer from './Visualizer'
 
 interface ProcessingSectionProps {
   audioFile: File
+  isProcessing: boolean
   onCancel: () => void
 }
 
-export default function ProcessingSection({ audioFile, onCancel }: ProcessingSectionProps) {
+export default function ProcessingSection({ audioFile, isProcessing, onCancel }: ProcessingSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -108,10 +109,22 @@ export default function ProcessingSection({ audioFile, onCancel }: ProcessingSec
       </div>
 
       <div className="mt-8 text-center">
-        <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:opacity-90 transition-all flex items-center mx-auto space-x-2">
-          <Wand size={20} />
-          <span>Generate Visual Experience</span>
-        </button>
+        {isProcessing ? (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <p className="text-gray-400">Generating your visual experience...</p>
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
+          </div>
+        ) : (
+          <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:opacity-90 transition-all flex items-center mx-auto space-x-2">
+            <Wand size={20} />
+            <span>Generate Visual Experience</span>
+          </button>
+        )}
       </div>
     </div>
   )

@@ -4,28 +4,47 @@ import { useState } from 'react'
 import UploadSection from '../components/UploadSection'
 import ProcessingSection from '../components/ProcessingSection'
 import ResultSection from '../components/ResultSection'
+import { apiService, GenerationResult } from '../lib/api'
 
 type AppState = 'upload' | 'processing' | 'result'
 
 export default function Home() {
   const [currentState, setCurrentState] = useState<AppState>('upload')
   const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [resultVideoUrl, setResultVideoUrl] = useState<string>('')
+  const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     setAudioFile(file)
     setCurrentState('processing')
+    setIsProcessing(true)
+    setError(null)
     
-    // Simulate processing and generation
-    setTimeout(() => {
-      setResultVideoUrl('https://example.com/generated-video.mp4')
+    try {
+      // First analyze the music
+      const analysisResponse = await apiService.analyzeMusic(file)
+      console.log('Music analysis:', analysisResponse.analysis)
+      
+      // Then generate the video
+      const videoResponse = await apiService.generateVideo(file)
+      console.log('Video generation result:', videoResponse.result)
+      
+      setGenerationResult(videoResponse.result)
       setCurrentState('result')
-    }, 3000)
+    } catch (err) {
+      console.error('Error during processing:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred during processing')
+      setCurrentState('upload')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const handleNewUpload = () => {
     setAudioFile(null)
-    setResultVideoUrl('')
+    setGenerationResult(null)
+    setError(null)
     setCurrentState('upload')
   }
 
@@ -48,15 +67,28 @@ export default function Home() {
         {currentState === 'processing' && audioFile && (
           <ProcessingSection 
             audioFile={audioFile}
+            isProcessing={isProcessing}
             onCancel={() => setCurrentState('upload')}
           />
         )}
         
-        {currentState === 'result' && resultVideoUrl && (
+        {currentState === 'result' && generationResult && (
           <ResultSection 
-            videoUrl={resultVideoUrl}
+            generationResult={generationResult}
             onNewUpload={handleNewUpload}
           />
+        )}
+        
+        {error && (
+          <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 text-center">
+            <p className="text-red-400">Error: {error}</p>
+            <button 
+              onClick={handleNewUpload}
+              className="mt-2 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition"
+            >
+              Try Again
+            </button>
+          </div>
         )}
       </main>
     </div>
