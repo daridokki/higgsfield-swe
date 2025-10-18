@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonicCanvas | Audio to Visual Magic</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .waveform {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            height: 6px;
+        }
+        .waveform-progress {
+            background: linear-gradient(90deg, #7f5af0 0%, #2cb67d 100%);
+            border-radius: 100px;
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        .dropzone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .dropzone.active {
+            border-color: #7f5af0;
+            background: rgba(127, 90, 240, 0.1);
+        }
+        .visualizer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(127, 90, 240, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(127, 90, 240, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(127, 90, 240, 0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <div class="container mx-auto px-4 py-12">
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">SonicCanvas</h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Upload your audio and watch it transform into a mesmerizing visual experience ✨</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <!-- Upload Section -->
+            <div id="dropzone" class="dropzone rounded-xl p-8 mb-12 text-center cursor-pointer">
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <div class="bg-indigo-900/50 p-6 rounded-full">
+                        <i data-feather="upload-cloud" class="w-12 h-12 text-indigo-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold">Drop your audio file here</h2>
+                    <p class="text-gray-400">Or click to browse your files</p>
+                    <input type="file" id="audio-upload" accept="audio/*" class="hidden">
+                    <button id="upload-btn" class="mt-4 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full font-medium hover:opacity-90 transition-all pulse">
+                        Select File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Processing State (Hidden Initially) -->
+            <div id="processing-section" class="hidden">
+                <div class="visualizer rounded-xl overflow-hidden mb-8 h-64 flex items-center justify-center">
+                    <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 id="filename" class="text-lg font-medium"></h3>
+                        <p id="file-info" class="text-sm text-gray-400"></p>
+                    </div>
+                    <button id="cancel-btn" class="text-red-400 hover:text-red-300 transition">
+                        <i data-feather="x-circle"></i> Cancel
+                    </button>
+                </div>
+
+                <div class="waveform mb-6">
+                    <div id="waveform-progress" class="waveform-progress"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex space-x-4">
+                        <button id="play-btn" class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-700 transition">
+                            <i data-feather="play"></i>
+                        </button>
+                        <span id="current-time" class="flex items-center">0:00</span>
+                    </div>
+                    <span id="duration" class="text-gray-400">0:00</span>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button id="generate-btn" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:opacity-90 transition-all flex items-center mx-auto space-x-2">
+                        <i data-feather="wand"></i>
+                        <span>Generate Visual Experience</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Section (Hidden Initially) -->
+            <div id="result-section" class="hidden mt-12 text-center">
+                <div class="visualizer rounded-xl overflow-hidden mb-8 h-96 relative">
+                    <video id="result-video" controls class="w-full h-full object-cover"></video>
+                    <div id="download-overlay" class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition bg-black/50">
+                        <a id="download-btn" class="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition flex items-center space-x-2">
+                            <i data-feather="download"></i>
+                            <span>Download Video</span>
+                        </a>
+                    </div>
+                </div>
+                <button id="new-upload-btn" class="px-6 py-2 border border-gray-600 rounded-full font-medium hover:bg-gray-800/50 transition">
+                    <i data-feather="plus"></i> Create Another
+                </button>
+            </div>
+        </main>
+    </div>
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h3 id="filename" class="text-lg font-medium"></h3>
+            <p id="file-info" class="text-sm text-gray-400"></p>
+        </div>
+        <button id="cancel-btn" class="text-red-400 hover:text-red-300 transition">
+            <i data-feather="x-circle"></i> Cancel
+        </button>
+    </div>
+
+    <div class="waveform mb-6">
+        <div id="waveform-progress" class="waveform-progress"></div>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <div class="flex space-x-4">
+            <button id="play-btn" class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-700 transition">
+                <i data-feather="play"></i>
+            </button>
+            <span id="current-time" class="flex items-center">0:00</span>
+        </div>
+        <span id="duration" class="text-gray-400">0:00</span>
+    </div>
+
+    <div class="mt-8 text-center">
+        <button id="generate-btn" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:opacity-90 transition-all flex items-center mx-auto space-x-2">
+            <i data-feather="wand"></i>
+            <span>Generate Visual Experience</span>
+        </button>
+    </div>
+</div>
+
+<!-- Result Section (Hidden Initially) -->
+<div id="result-section" class="hidden mt-12 text-center">
+    <div class="visualizer rounded-xl overflow-hidden mb-8 h-96 relative">
+        <video id="result-video" controls class="w-full h-full object-cover"></video>
+        <div id="download-overlay" class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition bg-black/50">
+            <a id="download-btn" class="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition flex items-center space-x-2">
+                <i data-feather="download"></i>
+                <span>Download Video</span>
+            </a>
+        </div>
+    </div>
+    <button id="new-upload-btn" class="px-6 py-2 border border-gray-600 rounded-full font-medium hover:bg-gray-800/50 transition">
+        <i data-feather="plus"></i> Create Another
+    </button>
+</div>
+</main>
+</div>
