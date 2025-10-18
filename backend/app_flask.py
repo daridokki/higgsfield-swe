@@ -9,7 +9,20 @@ from video_generator import VideoGenerator
 from config import Config
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'])
+
+# Configure CORS for production
+allowed_origins = [
+    'http://localhost:3000', 
+    'http://127.0.0.1:3000',
+    # Add your Vercel domain here after deployment
+    'https://your-app-name.vercel.app'
+]
+
+# Allow all origins in development, specific origins in production
+if os.environ.get('ENVIRONMENT') == 'production':
+    CORS(app, origins=allowed_origins)
+else:
+    CORS(app, origins=['*'])
 
 # Configure upload settings
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
@@ -194,12 +207,16 @@ if __name__ == '__main__':
     # Create upload folder
     os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
     
+    # Get port from environment (for production deployment)
+    port = int(os.environ.get('PORT', 8000))
+    host = os.environ.get('HOST', '0.0.0.0')
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
     print("🚀 Starting Music-to-Video Flask Server...")
     print("📍 Available Endpoints:")
-    print("   GET  http://localhost:5000/health")
-    print("   POST http://localhost:5000/analyze-music") 
-    print("   POST http://localhost:5000/generate-video")
-    print("   GET  http://localhost:5000/budget")
+    print(f"   GET  http://{host}:{port}/health")
+    print(f"   POST http://{host}:{port}/analyze-music") 
+    print(f"   POST http://{host}:{port}/generate-video")
     print("")
     
-    app.run(host='localhost', port=8000, debug=True)
+    app.run(host=host, port=port, debug=debug)
