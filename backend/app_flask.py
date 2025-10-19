@@ -14,13 +14,16 @@ app = Flask(__name__)
 allowed_origins = [
     'http://localhost:3000', 
     'http://127.0.0.1:3000',
-    # Vercel frontend domain
-    'https://vision-of-sound-8wx4495w6-daridokkis-projects.vercel.app'
+    # Vercel frontend domains (both old and new)
+    'https://vision-of-sound-8wx4495w6-daridokkis-projects.vercel.app',
+    'https://vision-of-sound.vercel.app',
+    # Allow all Vercel domains for now
+    'https://*.vercel.app'
 ]
 
 # Allow all origins in development, specific origins in production
 if os.environ.get('ENVIRONMENT') == 'production':
-    CORS(app, origins=allowed_origins)
+    CORS(app, origins=['*'])  # Temporarily allow all origins
 else:
     CORS(app, origins=['*'])
 
