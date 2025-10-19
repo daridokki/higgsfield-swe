@@ -3,6 +3,7 @@
 
 import React,{ useState, useRef, useEffect } from 'react'
 import { Play, Circle, Star } from 'lucide-react'
+import { config } from '../lib/config'
 
 interface ProcessingSectionProps {
   audioFile: File
@@ -49,7 +50,7 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
 
     const pollProgress = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/progress')
+        const response = await fetch(`${config.apiUrl}/progress`)
         const progressData = await response.json()
         
         setProcessingProgress(progressData.progress)

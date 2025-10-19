@@ -50,7 +50,7 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         "status": "healthy",
-        "message": "Music-to-Video Server is running!",
+        "message": "Music-to-Video Server is running with CORS fix!",
         "endpoints": {
             "POST /analyze-music": "Analyze music without generating video",
             "POST /generate-video": "Full music-to-video generation",
