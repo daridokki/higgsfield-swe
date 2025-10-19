@@ -23,14 +23,14 @@ export default function Home() {
     setError(null)
     
     try {
-      // First check if backend is running
-      console.log('Checking backend health...')
-      const healthResponse = await apiService.checkHealth()
-      console.log('Health check response:', healthResponse)
+      // Temporarily skip health check to test direct API calls
+      console.log('Skipping health check for now...')
+      // const healthResponse = await apiService.checkHealth()
+      // console.log('Health check response:', healthResponse)
       
-      if (healthResponse.status === 'error') {
-        throw new Error(`Backend server is not running: ${healthResponse.error}`)
-      }
+      // if (healthResponse.status === 'error') {
+      //   throw new Error(`Backend server is not running: ${healthResponse.error}`)
+      // }
       // First analyze the music
       const analysisResponse = await apiService.analyzeMusic(file)
       console.log('Music analysis:', analysisResponse.data?.analysis)
