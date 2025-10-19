@@ -89,6 +89,7 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}/analyze-music`, {
         method: 'POST',
         body: formData,
+        mode: 'cors',
       })
 
       console.log('Response status:', response.status)
@@ -125,6 +126,7 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}/generate-video`, {
         method: 'POST',
         body: formData,
+        mode: 'cors',
       })
 
       console.log('Video generation response status:', response.status)
