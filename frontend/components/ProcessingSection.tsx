@@ -44,36 +44,24 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
     }
   }, [audioFile])
 
-  // Real progress tracking from backend
+  // Temporarily disable progress tracking to avoid CORS errors
   useEffect(() => {
     if (!isProcessing) return
 
-    const pollProgress = async () => {
-      try {
-        const response = await fetch(`${config.apiUrl}/progress`)
-        const progressData = await response.json()
-        
-        setProcessingProgress(progressData.progress)
-        setCurrentStep(progressData.step)
-        
-        // Stop polling when complete
-        if (progressData.is_complete) {
-          return
+    // Simulate progress instead of polling backend
+    const simulateProgress = () => {
+      setCurrentStep('Processing your audio...')
+      setProcessingProgress(prev => {
+        const newProgress = prev + 10
+        if (newProgress < 90) {
+          setTimeout(simulateProgress, 1000)
         }
-        
-        // Continue polling every 1 second
-        setTimeout(pollProgress, 1000)
-      } catch (error) {
-        console.error('Error polling progress:', error)
-        // Fallback to simulated progress if polling fails
-        setCurrentStep('Processing...')
-        setProcessingProgress(prev => Math.min(prev + 10, 90))
-        setTimeout(pollProgress, 2000)
-      }
+        return Math.min(newProgress, 90)
+      })
     }
 
-    // Start polling
-    pollProgress()
+    // Start simulation
+    setTimeout(simulateProgress, 1000)
   }, [isProcessing])
 
   const togglePlayback = () => {
