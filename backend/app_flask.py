@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
 import os
 import uuid
 import json
@@ -10,22 +9,13 @@ from config import Config
 
 app = Flask(__name__)
 
-# Configure CORS for production
-allowed_origins = [
-    'http://localhost:3000', 
-    'http://127.0.0.1:3000',
-    # Vercel frontend domains (both old and new)
-    'https://vision-of-sound-8wx4495w6-daridokkis-projects.vercel.app',
-    'https://vision-of-sound.vercel.app',
-    # Allow all Vercel domains for now
-    'https://*.vercel.app'
-]
-
-# Configure CORS to allow all origins
-CORS(app, origins=['*'], 
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-     allow_headers=['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials'],
-     supports_credentials=True)
+# Custom CORS middleware
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
 # Configure upload settings
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
@@ -55,17 +45,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
 
-@app.route('/health', methods=['GET', 'OPTIONS'])
+@app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    if request.method == 'OPTIONS':
-        response = jsonify({})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        return response
-    
-    response = jsonify({
+    return jsonify({
         "status": "healthy",
         "message": "Music-to-Video Server is running!",
         "endpoints": {
@@ -74,8 +57,6 @@ def health_check():
             "GET /progress": "Get generation progress"
         }
     })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
 
 
 @app.route('/progress', methods=['GET'])
@@ -83,14 +64,8 @@ def get_progress():
     """Get current generation progress"""
     return jsonify(current_progress)
 
-@app.route('/analyze-music', methods=['POST', 'OPTIONS'])
+@app.route('/analyze-music', methods=['POST'])
 def analyze_music():
-    if request.method == 'OPTIONS':
-        response = jsonify({})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        return response
     """Analyze uploaded music file"""
     try:
         if 'file' not in request.files:
@@ -124,14 +99,8 @@ def analyze_music():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/generate-video', methods=['POST', 'OPTIONS'])
+@app.route('/generate-video', methods=['POST'])
 def generate_video():
-    if request.method == 'OPTIONS':
-        response = jsonify({})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        return response
     """Generate video from uploaded music file"""
     try:
         if 'file' not in request.files:
