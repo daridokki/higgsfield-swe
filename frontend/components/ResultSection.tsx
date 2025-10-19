@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Download, Plus, Music, Zap } from 'lucide-react'
 import { GenerationResult } from '../lib/api'
 

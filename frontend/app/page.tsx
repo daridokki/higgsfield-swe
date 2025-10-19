@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+// Component imports - TypeScript refresh
 import UploadSection from '../components/UploadSection'
 import ProcessingSection from '../components/ProcessingSection'
 import ResultSection from '../components/ResultSection'
