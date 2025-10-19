@@ -48,7 +48,7 @@ def allowed_file(filename):
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({
+    response = jsonify({
         "status": "healthy",
         "message": "Music-to-Video Server is running with CORS fix!",
         "endpoints": {
@@ -57,6 +57,11 @@ def health_check():
             "GET /progress": "Get generation progress"
         }
     })
+    # Force CORS headers
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
 
 
 @app.route('/progress', methods=['GET'])
