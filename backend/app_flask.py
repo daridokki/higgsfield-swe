@@ -21,11 +21,11 @@ allowed_origins = [
     'https://*.vercel.app'
 ]
 
-# Allow all origins in development, specific origins in production
-if os.environ.get('ENVIRONMENT') == 'production':
-    CORS(app, origins=['*'])  # Temporarily allow all origins
-else:
-    CORS(app, origins=['*'])
+# Configure CORS to allow all origins
+CORS(app, origins=['*'], 
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     allow_headers=['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials'],
+     supports_credentials=True)
 
 # Configure upload settings
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
@@ -55,10 +55,17 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
 
-@app.route('/health', methods=['GET'])
+@app.route('/health', methods=['GET', 'OPTIONS'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        return response
+    
+    response = jsonify({
         "status": "healthy",
         "message": "Music-to-Video Server is running!",
         "endpoints": {
@@ -67,6 +74,8 @@ def health_check():
             "GET /progress": "Get generation progress"
         }
     })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @app.route('/progress', methods=['GET'])
@@ -74,8 +83,14 @@ def get_progress():
     """Get current generation progress"""
     return jsonify(current_progress)
 
-@app.route('/analyze-music', methods=['POST'])
+@app.route('/analyze-music', methods=['POST', 'OPTIONS'])
 def analyze_music():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
     """Analyze uploaded music file"""
     try:
         if 'file' not in request.files:
@@ -109,8 +124,14 @@ def analyze_music():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/generate-video', methods=['POST'])
+@app.route('/generate-video', methods=['POST', 'OPTIONS'])
 def generate_video():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
     """Generate video from uploaded music file"""
     try:
         if 'file' not in request.files:
