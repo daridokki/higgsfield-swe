@@ -127,7 +127,7 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
             >
               <Play 
                 size={24} 
-                style={{ color: 'var(--background)', display: isPlaying ? 'none' : 'block' }}
+                className={`text-background ${isPlaying ? 'hidden' : 'block'}`} 
               />
               <div className={`text-background ${isPlaying ? 'block' : 'hidden'} flex space-x-1`}>
                 <div className="w-1 h-6 bg-background animate-pulse"></div>
@@ -147,7 +147,7 @@ export default function ProcessingSection({ audioFile, isProcessing, onCancel }:
             <div className="relative">
               <div className="w-16 h-16 border-4 border-border rounded-full animate-spin border-t-accent"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <Wand size={24} style={{ color: 'var(--accent)' }} />
+                <Wand className="w-6 h-6 text-accent animate-pulse" />
               </div>
             </div>
             <div className="w-full max-w-md space-y-4">

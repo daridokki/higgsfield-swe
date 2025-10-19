@@ -76,7 +76,7 @@ export default function UploadSection({ onFileUpload }: UploadSectionProps) {
       >
         <div className="flex flex-col items-center justify-center space-y-6">
           <div className="p-8 rounded-full bg-surface border border-border">
-            <Upload size={64} style={{ color: 'var(--accent)' }} />
+            <Upload className="w-16 h-16 text-accent" />
           </div>
           <div className="text-center space-y-3">
             <h2 className="text-2xl font-semibold text-text-primary">
@@ -110,7 +110,7 @@ export default function UploadSection({ onFileUpload }: UploadSectionProps) {
       <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
         <div className="card text-center">
           <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-            <Upload size={24} style={{ color: 'var(--accent)' }} />
+            <Upload className="w-6 h-6 text-accent" />
           </div>
           <h3 className="font-semibold mb-2">Upload</h3>
           <p className="text-text-secondary text-sm">

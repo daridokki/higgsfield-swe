@@ -1,4 +1,5 @@
 import './globals.css'
+import React from 'react'
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
 

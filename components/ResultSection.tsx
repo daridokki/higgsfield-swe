@@ -1,7 +1,7 @@
 'use client'
-
-import React, { useState } from 'react'
-import { Download, Plus, Music, Zap } from 'lucide-react'
+import React from 'react'
+import { useState } from 'react'
+import { Download, Plus, Music, Star } from 'lucide-react'
 import { GenerationResult } from '../lib/api'
 
 interface ResultSectionProps {
@@ -59,7 +59,7 @@ export default function ResultSection({ generationResult, onNewUpload }: ResultS
       {/* Generated Videos */}
       <div className="space-y-8">
         <h3 className="text-2xl font-semibold flex items-center gap-3">
-          <Zap className="w-6 h-6 text-accent" />
+          <Star className="w-6 h-6 text-accent" />
           Generated Videos ({video_urls.length})
         </h3>
         
