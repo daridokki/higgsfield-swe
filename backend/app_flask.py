@@ -14,8 +14,8 @@ app = Flask(__name__)
 allowed_origins = [
     'http://localhost:3000', 
     'http://127.0.0.1:3000',
-    # Add your Vercel domain here after deployment
-    'https://YOUR_VERCEL_URL.vercel.app'
+    # Vercel frontend domain
+    'https://vision-of-sound-8wx4495w6-daridokkis-projects.vercel.app'
 ]
 
 # Allow all origins in development, specific origins in production

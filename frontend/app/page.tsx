@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 // Component imports - TypeScript refresh
-import UploadSection from '../../components/UploadSection'
-import ProcessingSection from '../../components/ProcessingSection'
-import ResultSection from '../../components/ResultSection'
+import UploadSection from '../components/UploadSection'
+import ProcessingSection from '../components/ProcessingSection'
+import ResultSection from '../components/ResultSection'
 import { apiService, GenerationResult } from '../lib/api'
 
 type AppState = 'upload' | 'processing' | 'result'
